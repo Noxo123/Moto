@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog de Motards</title>
+
+    <!-- Chargement des modules Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+        import { getStorage } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js';
+
+        const firebaseConfig = {
+            apiKey: "TON_API_KEY",
+            authDomain: "ton-projet.firebaseapp.com",
+            projectId: "ton-projet",
+            storageBucket: "ton-projet.appspot.com",
+            messagingSenderId: "ID",
+            appId: "ID",
+            measurementId: "ID"
+        };
+
+        // Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // Exporter les instances pour les utiliser dans d'autres scripts
+        window.auth = auth;
+        window.db = db;
+        window.storage = storage;
+    </script>
+
+    <style>
+        body {
+            background-color: #333;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: #FFA500;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .upload-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #FFA500;
+            color: black;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .upload-btn:hover {
+            background-color: #ff7f00;
+        }
+
+        .chat-box {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .chat-btn {
+            padding: 10px 20px;
+            background-color: #FFA500;
+            color: black;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-btn:hover {
+            background-color: #ff7f00;
+        }
+    </style>
+</head>
+<body>
+
+    <form id="loginForm">
+        <input type="email" id="emailInput" placeholder="Email">
+        <input type="password" id="passwordInput" placeholder="Mot de passe" autocomplete="current-password">
+        <button type="submit">Se connecter</button>
+    </form>
+    
+    <script>
+        // Ajoute un gestionnaire pour la soumission du formulaire de connexion
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+    
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+    
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                console.log('Utilisateur connecté :', userCredential.user);
+            } catch (error) {
+                console.error('Erreur de connexion :', error);
+            }
+        });
+    </script>
+    
+    <div class="content">
+        <h1>Bienvenue sur le Blog des Motards</h1>
+
+        <div class="chat-box">
+            <button class="chat-btn" id="startChatBtn">Démarrer le chat vocal</button>
+            <div id="chatArea" style="display:none;">
+                <h2>Chat Vocal</h2>
+                <audio id="remoteAudio" autoplay></audio>
+                <button onclick="stopChat()" class="upload-btn">Arrêter le chat vocal</button>
+            </div>
+        </div>
+
+        <div class="blog-container" id="blogContainer">
+            <!-- Les articles seront affichés ici -->
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
