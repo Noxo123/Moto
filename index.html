@@ -3,27 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat de Proximité</title>
+    <title>Chat Vocal de Proximité</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        #chat { max-width: 600px; margin: auto; padding: 10px; }
-        #messages { height: 400px; overflow-y: scroll; border: 1px solid #ddd; margin-bottom: 10px; padding: 10px; }
-        #input-container { display: flex; }
-        input { flex: 1; padding: 10px; margin-right: 5px; }
-        button { padding: 10px; }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        #status { margin-bottom: 20px; }
+        button { padding: 10px 20px; margin: 10px; }
+        audio { display: block; margin: auto; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div id="chat">
-        <h1>Chat de Proximité</h1>
-        <div id="messages"></div>
-        <div id="input-container">
-            <input id="message-input" type="text" placeholder="Écrivez un message..." />
-            <button id="send-button">Envoyer</button>
-        </div>
-    </div>
+    <h1>Chat Vocal de Proximité</h1>
+    <div id="status">En attente d'utilisateur...</div>
+    <button id="start-call">Commencer un appel</button>
+    <button id="stop-call" disabled>Arrêter l'appel</button>
+    <audio id="remote-audio" autoplay></audio>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
