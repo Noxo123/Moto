@@ -57,3 +57,24 @@ function endCall() {
 
     console.log('Appel terminé.');
 }
+
+navigator.mediaDevices.enumerateDevices()
+  .then(devices => {
+    const audioDevices = devices.filter(device => device.kind === 'audioinput');
+    const deviceId = audioDevices.length > 0 ? audioDevices[0].deviceId : null;
+    
+    if (deviceId) {
+      return navigator.mediaDevices.getUserMedia({
+        audio: { deviceId: { exact: deviceId } }
+      });
+    } else {
+      throw new Error('Aucun microphone trouvé');
+    }
+  })
+  .then(stream => {
+    console.log('Microphone trouvé');
+    // Utilisation du flux ici
+  })
+  .catch(error => {
+    console.error('Erreur lors de l\'accès au microphone :', error);
+  });
