@@ -1,3 +1,6 @@
+// Importer Firebase Database
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-database.js";
+
 // Éléments DOM
 const startCallButton = document.getElementById('start-call');
 const endCallButton = document.getElementById('end-call');
@@ -20,10 +23,10 @@ async function startCall() {
         endCallButton.style.display = 'inline-block';
 
         // Enregistrer l'appel dans Firebase
-        const callRef = database.ref('calls').push();
-        callRef.set({ active: true });
+        const callRef = ref(database, 'calls/' + new Date().getTime());
+        set(callRef, { active: true });
 
-        console.log('Appel démarré, ID:', callRef.key);
+        console.log('Appel démarré');
     } catch (error) {
         console.error('Erreur lors du démarrage de l\'appel :', error);
         alert('Impossible d\'accéder au microphone.');
