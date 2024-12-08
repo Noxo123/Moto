@@ -60,11 +60,20 @@ function endCall() {
 
 navigator.mediaDevices.enumerateDevices()
   .then(devices => {
-    devices.forEach(device => {
-      console.log(device.kind, device.label, device.deviceId);
-    });
+    const audioDevices = devices.filter(device => device.kind === 'audioinput');
+    if (audioDevices.length > 0) {
+      // Choisir le premier périphérique audio disponible
+      const deviceId = audioDevices[0].deviceId;
+      return navigator.mediaDevices.getUserMedia({ audio: { deviceId: { exact: deviceId } } });
+    } else {
+      throw new Error('Aucun périphérique audio trouvé');
+    }
+  })
+  .then(stream => {
+    console.log('Appel démarré avec succès !');
+    // Utiliser le flux (stream)
   })
   .catch(err => {
-    console.log('Erreur lors de l\'énumération des périphériques:', err);
+    console.error('Erreur lors de l\'accès au périphérique audio:', err);
   });
 
