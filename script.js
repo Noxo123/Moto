@@ -60,21 +60,11 @@ function endCall() {
 
 navigator.mediaDevices.enumerateDevices()
   .then(devices => {
-    const audioDevices = devices.filter(device => device.kind === 'audioinput');
-    const deviceId = audioDevices.length > 0 ? audioDevices[0].deviceId : null;
-    
-    if (deviceId) {
-      return navigator.mediaDevices.getUserMedia({
-        audio: { deviceId: { exact: deviceId } }
-      });
-    } else {
-      throw new Error('Aucun microphone trouvé');
-    }
+    devices.forEach(device => {
+      console.log(device.kind, device.label, device.deviceId);
+    });
   })
-  .then(stream => {
-    console.log('Microphone trouvé');
-    // Utilisation du flux ici
-  })
-  .catch(error => {
-    console.error('Erreur lors de l\'accès au microphone :', error);
+  .catch(err => {
+    console.log('Erreur lors de l\'énumération des périphériques:', err);
   });
+
