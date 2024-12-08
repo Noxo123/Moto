@@ -114,11 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Fonction d'accès au microphone
-function startAudioCapture() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(stream => console.log("Microphone détecté"))
-    .catch(error => console.error("Erreur d'accès au microphone :", error.message));  
-}
+navigator.mediaDevices.getUserMedia({ audio: true })
+    .then((stream) => {
+        console.log("Microphone détecté !");
+    })
+    .catch((error) => {
+        console.error("Erreur : Aucun microphone trouvé ou permissions refusées.", error);
+    });
+
 
 // Fonction pour initier le chat de proximité vocal
 function initProximityChat() {
