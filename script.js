@@ -1,42 +1,70 @@
 import { database } from './firebase-config.js';
-import { ref, push, onChildAdded } from 'firebase/database';
+import { ref, set, onValue } from 'firebase/database';
 
-// Références HTML
-const messagesDiv = document.getElementById('messages');
-const messageInput = document.getElementById('message-input');
-const sendButton = document.getElementById('send-button');
+const startCallButton = document.getElementById('start-call');
+const stopCallButton = document.getElementById('stop-call');
+const remoteAudio = document.getElementById('remote-audio');
+const statusDiv = document.getElementById('status');
 
-// Référence Firebase
-const messagesRef = ref(database, 'messages');
+// WebRTC Variables
+let localStream;
+let peerConnection;
+const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
-// Ajouter un message
-sendButton.addEventListener('click', () => {
-    const message = messageInput.value;
-    if (message.trim() !== '') {
-        push(messagesRef, { text: message, timestamp: Date.now() });
-        messageInput.value = '';
-    }
-});
+// Références Firebase
+const callRef = ref(database, 'calls');
 
-// Afficher les messages en temps réel
-onChildAdded(messagesRef, (snapshot) => {
-    const messageData = snapshot.val();
-    const messageElement = document.createElement('div');
-    messageElement.textContent = messageData.text;
-    messagesDiv.appendChild(messageElement);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll automatique
-});
+// Initialiser le flux local
+async function startCall() {
+    statusDiv.textContent = "Connexion en cours...";
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    
+    peerConnection = new RTCPeerConnection(servers);
+    peerConnection.addStream(localStream);
 
-// Ajouter la géolocalisation (optionnel)
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            console.log('Position détectée :', position.coords);
-        },
-        (error) => {
-            console.error('Erreur de géolocalisation :', error);
+    // Gestion des flux entrants
+    peerConnection.onaddstream = (event) => {
+        remoteAudio.srcObject = event.stream;
+    };
+
+    // Gestion des ICE candidates
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+            set(callRef, { candidate: event.candidate });
         }
-    );
-} else {
-    console.log('Géolocalisation non supportée par ce navigateur.');
+    };
+
+    // Créer une offre
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    set(callRef, { offer });
+
+    // Écouter les réponses
+    onValue(callRef, async (snapshot) => {
+        const data = snapshot.val();
+        if (data?.answer && !peerConnection.remoteDescription) {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        }
+        if (data?.candidate) {
+            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+    });
+
+    startCallButton.disabled = true;
+    stopCallButton.disabled = false;
+    statusDiv.textContent = "Connecté.";
 }
+
+// Arrêter l'appel
+function stopCall() {
+    if (peerConnection) peerConnection.close();
+    if (localStream) localStream.getTracks().forEach((track) => track.stop());
+
+    startCallButton.disabled = false;
+    stopCallButton.disabled = true;
+    statusDiv.textContent = "Appel terminé.";
+}
+
+// Gestion des boutons
+startCallButton.addEventListener('click', startCall);
+stopCallButton.addEventListener('click', stopCall);
