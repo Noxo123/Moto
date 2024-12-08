@@ -77,13 +77,13 @@ async function publishPost(title, content, imageFile) {
 }
 
 // Vérifier si l'utilisateur est connecté
-onAuthStateChanged(auth, (user) => {
+firebase.auth().onAuthStateChanged(user => {
     if (user) {
-        console.log('Utilisateur connecté:', user.email);
+      console.log("Utilisateur connecté :", user.email);
     } else {
-        console.log('Utilisateur non connecté');
+      console.log("Utilisateur non connecté");
     }
-});
+  });  
 
 // Fonction pour gérer la soumission du formulaire de publication
 document.addEventListener('DOMContentLoaded', () => {
@@ -116,14 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // Fonction d'accès au microphone
 function startAudioCapture() {
     navigator.mediaDevices.getUserMedia({ audio: true })
-        .then((stream) => {
-            console.log('Microphone accessible');
-            // Traitez ici le flux audio si nécessaire (ex. pour le chat vocal)
-        })
-        .catch((error) => {
-            console.error('Erreur lors de l\'accès au microphone :', error);
-            alert('Le microphone est introuvable ou l\'accès a été refusé.');
-        });
+    .then(stream => console.log("Microphone détecté"))
+    .catch(error => console.error("Erreur d'accès au microphone :", error.message));  
 }
 
 // Fonction pour initier le chat de proximité vocal
