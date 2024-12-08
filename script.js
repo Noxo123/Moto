@@ -1,4 +1,4 @@
-import { database } from './firebase-config.js';
+import { database } from '/firebase-config.js';
 import { ref, set, onValue } from 'firebase/database';
 
 const startCallButton = document.getElementById('start-call');
